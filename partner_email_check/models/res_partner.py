@@ -71,11 +71,11 @@ class ResPartner(models.Model):
                 check_deliverability=self._should_check_deliverability(),
             )
         except EmailSyntaxError:
-            raise ValidationError(_("%s is an invalid email") % email.strip())
+            raise ValidationError(_("%s is an invalid email") % email.strip()) from None
         except EmailUndeliverableError:
             raise ValidationError(
                 _("Cannot deliver to email address %s") % email.strip()
-            )
+            ) from None
         return result["local"].lower() + "@" + result["domain_i18n"]
 
     def _should_check_syntax(self):
