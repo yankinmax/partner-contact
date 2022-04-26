@@ -5,6 +5,7 @@ import logging
 
 from odoo import _, api, models
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import config
 
 _logger = logging.getLogger(__name__)
 
@@ -56,6 +57,7 @@ class ResPartner(models.Model):
                     )
 
     def _normalize_email(self, email):
+        test_environment = config["test_enable"] if config["test_enable"] else False
         if not self._should_check_syntax():
             return email
         if validate_email is None:
@@ -69,6 +71,8 @@ class ResPartner(models.Model):
             result = validate_email(
                 email,
                 check_deliverability=self._should_check_deliverability(),
+                allow_empty_local=test_environment,
+                test_environment=test_environment,
             )
         except EmailSyntaxError:
             raise ValidationError(_("%s is an invalid email") % email.strip()) from None
